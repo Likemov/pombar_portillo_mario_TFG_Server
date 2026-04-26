@@ -1,0 +1,6 @@
+@echo off
+echo Levantando servicios en segundo plano...
+docker-compose up --build -d
+
+echo Mostrando logs de sgvtp_app...
+docker-compose logs -f app

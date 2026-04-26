@@ -1,0 +1,26 @@
+services:
+  gvtp_mysql:
+    image: mysql:8
+    container_name: sgvtp_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sgvtp_db
+      MYSQL_USER: sgvtp_admin
+      MYSQL_PASSWORD: pswrd
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  app:
+    build: .
+    container_name: sgvtp_app
+    depends_on:
+      - gvtp_mysql
+    ports:
+      - "2000:2000"
+
+volumes:
+  mysql_data:
