@@ -109,4 +109,12 @@ public class Billete implements Serializable{
     public float getPrecioFinal() {
         return precioBase * (descuento / 100);
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Billete)) return false;
+        Billete b = (Billete) o;
+        return id == b.getId();
+    }
 }

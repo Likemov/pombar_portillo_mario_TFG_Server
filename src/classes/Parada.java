@@ -36,5 +36,12 @@ public class Parada implements Serializable{
         this.id = id;
     }
     
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Parada)) return false;
+        Parada p = (Parada) o;
+        return id == p.getId();
+    }
     
 }

@@ -66,5 +66,11 @@ public class Tramo implements Serializable{
         this.id = id;
     }
     
-    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tramo)) return false;
+        Tramo t = (Tramo) o;
+        return id == t.getId();
+    }    
 }
