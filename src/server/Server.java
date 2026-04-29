@@ -35,6 +35,7 @@ public class Server extends Thread {
     static final String REGISTER="REGISTER";
     static final String MANAGE_TICKETS="MANAGE_TICKETS";
     static final String CREATE_TICKET="CREATE_TICKET";
+    static final String UPDATE_TICKET="UPDATE_TICKET";
     static final String DELETE_TICKET="DELETE_TICKET";
     static final String DELETE_USER="DELETE_USER";
     static final String DELETE_USER_OUTPUT="DELETE USER SUCCESS";
@@ -43,11 +44,13 @@ public class Server extends Thread {
     static final String REGISTER_OUTPUT="REGISTER SUCCESS";
     static final String MANAGE_TICKETS_OUTPUT="MANAGE TICKETS SUCCESS";
     static final String CREATE_TICKET_OUTPUT="CREATE TICKET SUCCESS";
+    static final String UPDATE_TICKET_OUTPUT="UPDATE TICKET SUCCESS";
     static final String DELETE_TICKET_OUTPUT="DELETE TICKET SUCCESS";
     //Excepciones a mostrar
     static final String EXCEPTION_REGISTER="No se pudo registrar al usuario";
     static final String EXCEPTION_DELETE_USER="No se pudo borrar el usuario";
     static final String EXCEPTION_CREATE_TICKET="No se pudo crear el billete";
+    static final String EXCEPTION_UPDATE_TICKET="No se pudo editar el billete";
     static final String EXCEPTION_DELETE_TICKET="No se pudo borrar el billete";
     static final String EXCEPTION_REGISTER_EMAIL_EXIST="Usuario ya existe con ese correo electrónico";
     
@@ -124,6 +127,28 @@ public class Server extends Thread {
                             }
                             else{
                                 objectOutput.writeObject(new Mensaje(EXCEPTION_CREATE_TICKET, null));
+                            }
+                            break;
+                        } catch (Exception e){
+                            //Trato de enviar la causa del error al cliente   
+                            objectOutput.writeObject(new Mensaje(e.getMessage(), null));
+                        }
+                        break;
+                        
+                    //Caso CREATE_TICKET
+                    case UPDATE_TICKET:
+                        System.out.println("Petición " + UPDATE_TICKET + " recibida");
+                        try{
+                            Billete billete = (Billete) input.getContenido();                            
+                            boolean success = this.updateTicket(billete);
+                            //Devuelvo al cliente que la operación ha sido un éxito
+                            if (success){
+                                ArrayList<Billete> listaBilletes = dataBase.getBilletesOfUsuario(billete.getUsuario());
+                                System.out.println("Lista de Billetes adjuntada del usuario " + billete.getUsuario().getNombre());
+                                objectOutput.writeObject(new Mensaje(UPDATE_TICKET_OUTPUT, listaBilletes));
+                            }
+                            else{
+                                objectOutput.writeObject(new Mensaje(EXCEPTION_UPDATE_TICKET, null));
                             }
                             break;
                         } catch (Exception e){
@@ -265,7 +290,21 @@ public class Server extends Thread {
         if(!success){
             //Envío "Ya no estoy listo"
             System.err.println("De alguna manera, no se ha podido crear el billete");
-            throw new Exception(EXCEPTION_REGISTER);
+            throw new Exception(EXCEPTION_CREATE_TICKET);
+        }
+        //Devuelvo "[USUARIO] registrado"
+        return true;
+    }
+    
+    //Método de la función UPDATE_TICKET
+    private boolean updateTicket(Billete billete) throws Exception{
+        //Trato de crear el nuevo Billete
+        boolean success = dataBase.updateTicket(billete);
+        //Si no puedo crearlo...
+        if(!success){
+            //Envío "Ya no estoy listo"
+            System.err.println("De alguna manera, no se ha podido editar el billete");
+            throw new Exception(EXCEPTION_UPDATE_TICKET);
         }
         //Devuelvo "[USUARIO] registrado"
         return true;
@@ -278,7 +317,7 @@ public class Server extends Thread {
         if(!success){
             //Envío "Ya no estoy listo"
             System.err.println("De alguna manera, no se ha podido borrar el billete");
-            throw new Exception(EXCEPTION_REGISTER);
+            throw new Exception(EXCEPTION_DELETE_TICKET);
         }
         //Devuelvo "[USUARIO] registrado"
         return true;
