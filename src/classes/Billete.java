@@ -107,7 +107,7 @@ public class Billete implements Serializable{
     }
     
     public float getPrecioFinal() {
-        return precioBase * (descuento / 100);
+        return precioBase - (precioBase * (descuento / 100));
     }
     
     @Override
